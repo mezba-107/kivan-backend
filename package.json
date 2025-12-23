@@ -1,0 +1,40 @@
+{
+  "name": "ki-van-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "server": "nodemon server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+"repository": {
+  "type": "git",
+  "url": "https://github.com/mezba-107/kivan-backend.git"
+},
+
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mezba-107/KI-VAN/issues"
+  },
+  "homepage": "https://github.com/mezba-107/KI-VAN#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-validator": "^7.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.3",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
