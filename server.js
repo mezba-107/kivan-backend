@@ -29,6 +29,12 @@ app.get("/", (req, res) => {
   res.send("Backend OK");
 });
 
+// Health 
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+
 // ✅ uploads folder public
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -51,5 +57,6 @@ mongoose
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
 
 
