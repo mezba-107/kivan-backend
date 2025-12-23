@@ -12,7 +12,7 @@ import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 
 
-dotenv.config({ path: "./server/.env" });
+dotenv.config();
 
 const app = express();
 
@@ -23,6 +23,11 @@ const __dirname = path.dirname(__filename);
 // ✅ MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+
+// ✅ TEST ROUTE (IMPORTANT)
+app.get("/", (req, res) => {
+  res.send("Backend OK");
+});
 
 // ✅ uploads folder public
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -46,3 +51,4 @@ mongoose
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
