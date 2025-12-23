@@ -260,10 +260,19 @@ router.post("/reset-password-token", async (req, res) => {
   }
 });
 
-
+// ✅ এইটা নতুন add করবে
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 /* ============================================================
   EXPORT ROUTER (MUST BE LAST)
 ============================================================ */
 export default router;
+
