@@ -1,6 +1,5 @@
 import express from "express";
 import upload from "../middleware/upload.js";
-import profileUpload from "../middleware/profileUpload.js";
 import protect from "../middleware/auth.js";
 import isAdmin from "../middleware/isAdmin.js";
 
@@ -52,30 +51,6 @@ router.post(
     }
   }
 );
-
-// ===============================
-// ✅ PROFILE IMAGE UPLOAD (USER)
-// ===============================
-router.post(
-  "/profile",
-  protect,
-  profileUpload.single("image"),
-  (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No image uploaded" });
-      }
-
-      res.json({
-        image: `/uploads/profile/${req.file.filename}`,
-      });
-    } catch (err) {
-      console.error("❌ PROFILE UPLOAD ERROR:", err);
-      res.status(500).json({ message: "Profile upload failed" });
-    }
-  }
-);
-
 
 
 export default router;
