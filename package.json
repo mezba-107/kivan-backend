@@ -10,11 +10,10 @@
     "server": "nodemon server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-"repository": {
-  "type": "git",
-  "url": "https://github.com/mezba-107/kivan-backend.git"
-},
-
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mezba-107/kivan-backend.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -25,6 +24,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.3",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
