@@ -1,5 +1,6 @@
 import express from "express";
 import upload from "../middleware/upload.js";
+import profileUpload from "../middleware/profileUpload.js";
 import protect from "../middleware/auth.js";
 import isAdmin from "../middleware/isAdmin.js";
 
@@ -58,7 +59,7 @@ router.post(
 router.post(
   "/profile",
   protect,
-  upload.single("image"),
+  profileUpload.single("image"),
   (req, res) => {
     try {
       if (!req.file) {
