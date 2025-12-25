@@ -5,12 +5,12 @@ import dotenv from "dotenv";
 
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from "fs"; // ✅ ADD
 
 import authRoutes from "./routes/auth.js";
 import orderRoutes from "./routes/order.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+
 
 dotenv.config({ path: "./server/.env" });
 
@@ -19,23 +19,6 @@ const app = express();
 // ✅ ES module fix for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// ==================================================
-// ✅ AUTO CREATE UPLOAD FOLDERS (JUST THIS PART ADDED)
-// ==================================================
-const folders = [
-  path.join(__dirname, "uploads"),
-  path.join(__dirname, "uploads/products"),
-  path.join(__dirname, "uploads/gallery"),
-  path.join(__dirname, "uploads/profile"), // ✅ ADD THIS
-];
-
-folders.forEach((folder) => {
-  if (!fs.existsSync(folder)) {
-    fs.mkdirSync(folder, { recursive: true });
-  }
-});
-// ==================================================
 
 // ✅ MIDDLEWARE
 app.use(cors());
@@ -50,6 +33,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 
+
 const PORT = process.env.PORT || 5000;
 
 // ✅ DB CONNECT
@@ -62,4 +46,3 @@ mongoose
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-
