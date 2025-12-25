@@ -2,51 +2,55 @@ import express from "express";
 import upload from "../middleware/upload.js";
 import protect from "../middleware/auth.js";
 import isAdmin from "../middleware/isAdmin.js";
-import cloudinary from "../utils/cloudinary.js";
 
 const router = express.Router();
 
 /**
- * ✅ PRODUCT + GALLERY IMAGE UPLOAD (Cloudinary)
+ * ✅ PRODUCT IMAGE UPLOAD
  * Admin only
- * returns image URLs
+ * returns image URL
  */
 router.post(
   "/product",
   protect,
   isAdmin,
-  upload.array("images", 5),
-  async (req, res) => {
+  upload.single("image"),
+  (req, res) => {
+    res.status(201).json({
+      image: `/uploads/products/${req.file.filename}`,
+    });
+  }
+);
+
+
+// ===============================
+// ✅ UPLOAD PRODUCT GALLERY
+// ===============================
+
+router.post(
+  "/gallery",
+  protect,
+  isAdmin,
+  upload.array("gallery", 5), // max 5 images
+  (req, res) => {
     try {
-      if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: "No images uploaded" });
-      }
 
-      const urls = [];
+      // 🔍 DEBUG LOGS (ADD THESE)
+      console.log("GALLERY FILES:", req.files);
+      console.log("GALLERY BODY:", req.body);
 
-      for (const file of req.files) {
-        const result = await new Promise((resolve, reject) => {
-          cloudinary.uploader.upload_stream(
-            { folder: "products" },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result);
-            }
-          ).end(file.buffer);
-        });
+      const images = req.files.map(
+        file => `/uploads/products/${file.filename}`
+      );
 
-        urls.push(result.secure_url);
-      }
+      res.json({ images });
 
-      res.status(201).json({
-        success: true,
-        images: urls,
-      });
     } catch (err) {
-      console.error("❌ UPLOAD ERROR:", err);
-      res.status(500).json({ message: err.message });
+      console.error("❌ GALLERY ERROR:", err); // 👈 ADD
+      res.status(500).json({ message: "Gallery upload failed" });
     }
   }
 );
+
 
 export default router;
