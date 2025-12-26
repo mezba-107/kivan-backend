@@ -37,8 +37,13 @@ folders.forEach((folder) => {
 // ==================================================
 
 // ✅ MIDDLEWARE
-app.use(cors());
+
+app.use(cors({
+  origin: ["https://ki-van.netlify.app"],
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ✅ uploads folder public
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
