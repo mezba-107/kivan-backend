@@ -45,6 +45,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
 // ✅ uploads folder public
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
