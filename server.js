@@ -39,7 +39,7 @@ folders.forEach((folder) => {
 // ✅ MIDDLEWARE
 
 app.use(cors({
-  origin: ["https://ki-van.netlify.app"],
+  origin: ["https://ki-van-2.netlify.app"],
   credentials: true
 }));
 app.use(express.json());
