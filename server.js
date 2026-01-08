@@ -16,7 +16,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import adminOrdersRoute from "./routes/adminOrders.js";
 import ratingRoutes from "./routes/ratingRoutes.js";
 
-dotenv.config(); // 👈 JUST THIS
+dotenv.config({ path: "./server/.env" });
 
 const app = express();
 
@@ -25,16 +25,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ==================================================
-// ✅ AUTO CREATE UPLOAD FOLDERS (FIXED FOR RENDER)
+// ✅ AUTO CREATE UPLOAD FOLDERS (JUST THIS PART ADDED)
 // ==================================================
-
-const uploadRoot = path.join(process.cwd(), "uploads");
-
 const folders = [
-  uploadRoot,
-  path.join(uploadRoot, "profile"),
-  path.join(uploadRoot, "products"),
-  path.join(uploadRoot, "gallery"),
+  path.join(__dirname, "uploads"),
+  path.join(__dirname, "uploads/products"),
+  path.join(__dirname, "uploads/gallery"),
 ];
 
 folders.forEach((folder) => {
@@ -56,8 +52,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ STATIC UPLOADS (FIXED)
-app.use("/uploads", express.static(uploadRoot));
+// ✅ uploads folder public
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ ROUTES (UNCHANGED)
 app.use("/api/auth", authRoutes);
