@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from "fs"; // ✅ ADD
+import fs from "fs";
 
 import authRoutes from "./routes/auth.js";
 import orderRoutes from "./routes/order.js";
@@ -20,18 +20,21 @@ dotenv.config({ path: "./server/.env" });
 
 const app = express();
 
-// ✅ ES module fix for __dirname
+// ✅ ES module fix for __dirname (UNCHANGED)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ==================================================
-// ✅ AUTO CREATE UPLOAD FOLDERS (JUST THIS PART ADDED)
+// ✅ AUTO CREATE UPLOAD FOLDERS (FIXED FOR RENDER)
 // ==================================================
+
+const uploadRoot = path.join(process.cwd(), "uploads");
+
 const folders = [
-  path.join(__dirname, "uploads"),
-  path.join(__dirname, "uploads/products"),
-  path.join(__dirname, "uploads/gallery"),
-  path.join(__dirname, "uploads/profile"), // ✅ ADD THIS
+  uploadRoot,
+  path.join(uploadRoot, "profile"),
+  path.join(uploadRoot, "products"),
+  path.join(uploadRoot, "gallery"),
 ];
 
 folders.forEach((folder) => {
@@ -39,24 +42,24 @@ folders.forEach((folder) => {
     fs.mkdirSync(folder, { recursive: true });
   }
 });
+
 // ==================================================
 
-// ✅ MIDDLEWARE
-
-app.use(cors({
-  origin: ["https://ki-van-2.netlify.app"],
-  credentials: true
-}));
+// ✅ MIDDLEWARE (UNCHANGED)
+app.use(
+  cors({
+    origin: ["https://ki-van-2.netlify.app"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ✅ STATIC UPLOADS (FIXED)
+app.use("/uploads", express.static(uploadRoot));
 
-
-// ✅ uploads folder public
-app.use("/uploads", express.static("/uploads"));
-
-// ✅ ROUTES
+// ✅ ROUTES (UNCHANGED)
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
@@ -68,13 +71,13 @@ app.use("/api/ratings", ratingRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-// ✅ DB CONNECT
+// ✅ DB CONNECT (UNCHANGED)
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ MongoDB Error:", err));
 
-// ✅ SERVER START
+// ✅ SERVER START (UNCHANGED)
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
