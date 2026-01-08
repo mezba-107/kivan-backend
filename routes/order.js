@@ -95,4 +95,106 @@ router.get("/guest-invoice/:id", async (req, res) => {
 });
 
 
+
+
+// Cancel order request (user)
+router.post("/cancel-request/:id", auth, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.status !== "pending" && order.status !== "confirmed") {
+      return res.status(400).json({ message: "Order cannot be cancelled" });
+    }
+
+order.cancelRequest = {
+  requested: true,
+  reason: req.body.reason || "",
+  status: "pending"
+};
+
+
+    await order.save();
+
+    res.json({ message: "Cancel request sent" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// ===============================
+// ✅ ADMIN – APPROVE CANCEL REQUEST
+// ===============================
+router.put(
+  "/admin/cancel-request/approve/:orderId",
+  auth,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const order = await Order.findById(req.params.orderId);
+
+      if (!order || !order.cancelRequest?.requested) {
+        return res.status(404).json({ message: "Cancel request not found" });
+      }
+
+      // ✅ MAIN CHANGE
+      order.cancelRequest.status = "approved";
+      order.status = "cancelled";
+
+      await order.save();
+
+      res.json({ message: "Cancel request approved" });
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+
+// ===============================
+// ✅ ADMIN – DECLINE CANCEL REQUEST
+// ===============================
+router.put(
+  "/admin/cancel-request/decline/:orderId",
+  auth,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const order = await Order.findById(req.params.orderId);
+
+      if (!order || !order.cancelRequest?.requested) {
+        return res.status(404).json({ message: "Cancel request not found" });
+      }
+
+      // ✅ MAIN CHANGE
+      order.cancelRequest.status = "declined";
+
+      await order.save();
+
+      res.json({ message: "Cancel request declined" });
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+
+
+router.get("/admin/pending-count", auth, isAdmin, async (req, res) => {
+  try {
+    const count = await Order.countDocuments({ status: "pending" });
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
 export default router; // ✅ YES, last line always OK

@@ -45,7 +45,14 @@ export const loginUser = async (req, res) => {
     res.status(200).json({
       message: "Login successful!",
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    city: user.city,
+    address: user.address,
+  },
     });
   } catch (error) {
     console.error("❌ Login error:", error);
@@ -58,26 +65,31 @@ export const loginUser = async (req, res) => {
 
 
 // Update username
-exports.updateName = async (req, res) => {
+export const updateName = async (req, res) => {
   try {
+    const { id, name } = req.body;
+
     const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { username: req.body.username },
+      id,
+      { name },
       { new: true }
     );
 
-    res.json({ success: true, username: user.username });
+    res.json({ success: true, name: user.name });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
+
 // Update phone
-exports.updatePhone = async (req, res) => {
+export const updatePhone = async (req, res) => {
   try {
+    const { id, phone } = req.body;
+
     const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { phone: req.body.phone },
+      id,
+      { phone },
       { new: true }
     );
 
@@ -87,17 +99,73 @@ exports.updatePhone = async (req, res) => {
   }
 };
 
+
 // Update address
-exports.updateAddress = async (req, res) => {
+export const updateAddress = async (req, res) => {
   try {
+    const { id, address } = req.body;
+
     const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { address: req.body.address },
+      id,
+      { address },
       { new: true }
     );
 
     res.json({ success: true, address: user.address });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+
+
+// ===================== UPDATE CITY =====================
+export const updateCity = async (req, res) => {
+  try {
+    const { id, city } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { city },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      city: user.city,
+    });
+  } catch (error) {
+    console.error("❌ Update city error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// ===================== UPDATE PROFILE IMAGE =====================
+
+export const updateProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.userId, // ✅ FIXED
+      { profileImage: req.file.filename },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      image: user.profileImage,
+    });
+  } catch (error) {
+    console.error("❌ Image upload error:", error);
+    res.status(500).json({ message: "Image upload failed" });
   }
 };

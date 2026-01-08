@@ -33,14 +33,46 @@ userInfo: {
     // ✅ ORDER STATUS
     status: {
       type: String,
-      enum: ["pending", "confirmed", "delivered", "cancelled"],
+        enum: [
+    "pending",
+    "confirmed",
+    "shipped",
+    "out-for-delivery",
+    "delivered",
+    "returned",
+    "cancelled"
+  ],
       default: "pending"
     },
+    
 
-    shippingCost: {
+    shippingCharge: {
   type: Number,
   default: 0
 },
+
+cancelRequest: {
+  requested: {
+    type: Boolean,
+    default: false
+  },
+  reason: {
+    type: String
+  },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "declined"],
+    default: "pending"
+  }
+},
+
+
+
+
+//     shippingCost: {
+//   type: Number,
+//   default: 0
+// },
 
 paymentMethod: {
   type: String,

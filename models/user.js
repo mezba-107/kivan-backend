@@ -13,9 +13,15 @@ role: {
 },
 
 
+profileImage: {
+  type: String,
+},
 
 
   phone: { type: String, default: "" },    // FIXED
+
+  city: { type: String, default: "" },
+  
   address: { type: String, default: "" },
 
   resetToken: { type: String },

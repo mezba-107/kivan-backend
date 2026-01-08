@@ -67,17 +67,21 @@ export const updateProduct = async (req, res) => {
     if (req.body.image && req.body.image !== product.image) {
 
       // delete old image file
-      if (product.image) {
-        const oldPath = path.join(
-          process.cwd(),
-          "server",
-          product.image
-        );
+if (product.image) {
+  const oldPath = path.join(
+    process.cwd(),
+    "server",
+    product.image
+  );
 
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath);
-        }
-      }
+  console.log("OLD IMAGE PATH:", oldPath);
+
+  if (fs.existsSync(oldPath)) {
+    fs.unlinkSync(oldPath);
+  }
+}
+
+
 
       product.image = req.body.image;
     }
@@ -101,27 +105,33 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product)
+    if (!product) {
       return res.status(404).json({ message: "Product not found" });
+    }
 
-    // ✅ delete image file
     if (product.image) {
+      // 🔥 DB value সরাসরি use
       const imgPath = path.join(
         process.cwd(),
         "server",
         product.image
       );
 
+      console.log("DELETE PATH:", imgPath);
+
       if (fs.existsSync(imgPath)) {
         fs.unlinkSync(imgPath);
+        console.log("🗑️ image deleted");
+      } else {
+        console.log("❌ image not found");
       }
     }
 
     await product.deleteOne();
-
     res.json({ message: "✅ Product deleted" });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Delete failed" });
   }
 };

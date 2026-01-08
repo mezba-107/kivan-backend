@@ -25,7 +25,8 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: "❌ Product not found" });
+    if (!product)
+      return res.status(404).json({ message: "❌ Product not found" });
     res.json(product);
   } catch {
     res.status(500).json({ message: "❌ Failed to get product" });
@@ -46,7 +47,7 @@ router.post("/", protect, isAdmin, async (req, res) => {
 });
 
 /* =====================================================
-   ✅ UPDATE PRODUCT (DELETE OLD IMAGE)
+   ✅ UPDATE PRODUCT (DELETE OLD IMAGE + OLD GALLERY)
 ===================================================== */
 router.put("/:id", protect, isAdmin, async (req, res) => {
   try {
@@ -60,12 +61,13 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
     product.price = price;
     product.description = description;
 
+    // ✅ DELETE OLD MAIN IMAGE IF CHANGED
     if (image && image !== product.image) {
       if (product.image) {
         const oldPath = path.join(
           process.cwd(),
           "server",
-          product.image
+          product.image.replace(/^\/+/, "")
         );
 
         if (fs.existsSync(oldPath)) {
@@ -73,15 +75,36 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
           console.log("✅ Old image deleted:", oldPath);
         }
       }
-
       product.image = image;
     }
 
-    // ✅ GALLERY UPDATE
-if (gallery && Array.isArray(gallery)) {
-  product.gallery = gallery;
-}
+    // ✅ DELETE OLD GALLERY IMAGES IF CHANGED
+    if (
+      gallery &&
+      Array.isArray(gallery) &&
+      product.gallery &&
+      product.gallery.length > 0
+    ) {
+      product.gallery.forEach(oldImg => {
+        if (!gallery.includes(oldImg)) {
+          const oldGalleryPath = path.join(
+            process.cwd(),
+            "server",
+            oldImg.replace(/^\/+/, "")
+          );
 
+          if (fs.existsSync(oldGalleryPath)) {
+            fs.unlinkSync(oldGalleryPath);
+            console.log("✅ Old gallery image deleted:", oldGalleryPath);
+          }
+        }
+      });
+    }
+
+    // ✅ UPDATE GALLERY
+    if (gallery && Array.isArray(gallery)) {
+      product.gallery = gallery;
+    }
 
     await product.save();
     res.json({ message: "✅ Product updated", product });
@@ -93,17 +116,22 @@ if (gallery && Array.isArray(gallery)) {
 });
 
 /* =====================================================
-   ✅ DELETE PRODUCT (DELETE IMAGE TOO)
+   🗑️ DELETE PRODUCT (DELETE IMAGE + GALLERY)
 ===================================================== */
 router.delete("/:id", protect, isAdmin, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (product?.image) {
+    if (!product) {
+      return res.status(404).json({ message: "❌ Product not found" });
+    }
+
+    // ✅ delete main image
+    if (product.image) {
       const imgPath = path.join(
         process.cwd(),
         "server",
-        product.image
+        product.image.replace(/^\/+/, "")
       );
 
       if (fs.existsSync(imgPath)) {
@@ -112,12 +140,66 @@ router.delete("/:id", protect, isAdmin, async (req, res) => {
       }
     }
 
+    // ✅ delete gallery images
+    if (product.gallery && product.gallery.length > 0) {
+      product.gallery.forEach(img => {
+        const gPath = path.join(
+          process.cwd(),
+          "server",
+          img.replace(/^\/+/, "")
+        );
+
+        if (fs.existsSync(gPath)) {
+          fs.unlinkSync(gPath);
+        }
+      });
+    }
+
     await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "✅ Product deleted" });
+
+    res.json({ message: "✅ Product & images deleted successfully" });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "❌ Failed to delete product" });
   }
 });
+
+/* =====================================================
+    ✅ GET PRODUCT STATS FOR ADMIN DASHBOARD
+===================================================== */
+
+router.get(
+  "/admin/product-stats",
+  protect,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const products = await Product.find();
+
+      const stats = {
+        total: products.length,
+        sneakers: 0,
+        tshirt: 0,
+        pant: 0,
+        hoodie: 0,
+      };
+
+      products.forEach(p => {
+        if (p.category === "sneakers") stats.sneakers++;
+        if (p.category === "tshirt") stats.tshirt++;
+        if (p.category === "pant") stats.pant++;
+        if (p.category === "hoodie") stats.hoodie++;
+      });
+
+      res.json(stats);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+
 
 export default router;

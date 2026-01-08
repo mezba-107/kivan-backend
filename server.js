@@ -11,6 +11,10 @@ import authRoutes from "./routes/auth.js";
 import orderRoutes from "./routes/order.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
+import adminOrdersRoute from "./routes/adminOrders.js";
+import ratingRoutes from "./routes/ratingRoutes.js";
 
 dotenv.config({ path: "./server/.env" });
 
@@ -42,6 +46,7 @@ app.use(cors({
   origin: ["https://ki-van-2.netlify.app"],
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -55,6 +60,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/orders", adminOrdersRoute);
+app.use("/api/ratings", ratingRoutes);
 
 const PORT = process.env.PORT || 5000;
 

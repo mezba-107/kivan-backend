@@ -78,6 +78,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        city: user.city,      // ✅ ADD THIS
         address: user.address,
       },
     });
@@ -85,6 +86,22 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
+/* ============================================================
+  UPDATE PROFILE IMAGE
+============================================================ */
+
+import upload from "../middleware/profileUpload.js";
+import { updateProfileImage } from "../controllers/authController.js";
+import protect from "../middleware/auth.js";
+
+router.put(
+  "/update-profile-image",
+  protect,
+  upload.single("image"),
+  updateProfileImage
+);
+
 
 /* ============================================================
   UPDATE NAME
@@ -137,6 +154,30 @@ router.put("/update-address", async (req, res) => {
       success: true,
       message: "Address updated",
       address: user.address,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+
+/* ============================================================
+  UPDATE CITY
+============================================================ */
+router.put("/update-city", async (req, res) => {
+  try {
+    const { id, city } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { city },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: "City updated",
+      city: user.city,
     });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

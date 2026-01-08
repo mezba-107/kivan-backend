@@ -7,7 +7,7 @@ import User from "../models/user.js";
 */
 export const createOrder = async (req, res) => {
   try {
-    const { items, totalAmount } = req.body;
+    const { items, totalAmount, shippingCharge } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
@@ -31,6 +31,7 @@ if (!user) {
       },
       items: items.map(i => ({ ...i })),
       totalAmount,
+      shippingCharge,
       status: "pending", // ✅ default status
     });
 
@@ -93,7 +94,7 @@ export const updateOrderStatus = async (req, res) => {
     const { status } = req.body;
 
     // allowed status
-    const allowedStatus = ["pending", "confirmed", "delivered", "cancelled"];
+    const allowedStatus = ["pending", "confirmed",  "shipped", "out-for-delivery", "returned", "delivered", "cancelled"];
 
     if (!allowedStatus.includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
@@ -151,7 +152,7 @@ export const createGuestOrder = async (req, res) => {
       address,
       items,
       totalAmount,
-      shippingCost,
+      shippingCharge,
       paymentMethod
     } = req.body;
 
@@ -168,7 +169,7 @@ export const createGuestOrder = async (req, res) => {
   },
   items,
   totalAmount,
-  shippingCost,
+  shippingCharge,
   paymentMethod,
   isGuest: true
 });
