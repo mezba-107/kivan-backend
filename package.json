@@ -10,11 +10,10 @@
     "server": "nodemon server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-"repository": {
-  "type": "git",
-  "url": "https://github.com/mezba-107/kivan-backend.git"
-},
-
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mezba-107/kivan-backend.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

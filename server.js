@@ -16,7 +16,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import adminOrdersRoute from "./routes/adminOrders.js";
 import ratingRoutes from "./routes/ratingRoutes.js";
 
-dotenv.config({ path: "./server/.env" });
+dotenv.config(); // 👈 JUST THIS
 
 const app = express();
 
