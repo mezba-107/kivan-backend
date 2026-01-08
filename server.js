@@ -28,10 +28,10 @@ const __dirname = path.dirname(__filename);
 // ✅ AUTO CREATE UPLOAD FOLDERS (JUST THIS PART ADDED)
 // ==================================================
 const folders = [
-  path.join(__dirname, "uploads"),
-  path.join(__dirname, "uploads/products"),
-  path.join(__dirname, "uploads/gallery"),
-  path.join(__dirname, "uploads/profile"), // ✅ ADD THIS
+  "/uploads",
+  "/uploads/profile",
+  "/uploads/products",
+  "/uploads/gallery",
 ];
 
 folders.forEach((folder) => {
@@ -53,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-// ✅ uploads folder public
+// ✅ ONLY THIS (VERY IMPORTANT)
 app.use("/uploads", express.static("/uploads"));
 
 // ✅ ROUTES
