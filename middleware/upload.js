@@ -1,49 +1,35 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "./server/.env" });
+
 import multer from "multer";
-import path from "path";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
-// ✅ storage config
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "server/uploads/products"); 
-  },
- filename(req, file, cb) {
-  const ext = path.extname(file.originalname);
-
-  const uniqueName =
-    "product-" +
-    Date.now() +
-    "-" +
-    Math.round(Math.random() * 1e9) +
-    ext;
-
-  cb(null, uniqueName);
-}
-
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// ✅ image file check
-function checkFileType(file, cb) {
-  const filetypes = /jpg|jpeg|png|webp|avif/;
-  const extname = filetypes.test(
-    path.extname(file.originalname).toLowerCase()
-  );
-  const mimetype =
-    file.mimetype.startsWith("image/");
-
-  if (extname && mimetype) {
-    cb(null, true);
-  } else {
-    cb(new Error("Images only!"));
-  }
-}
-
-
-// ✅ multer middleware
-const upload = multer({
-  storage,
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "products",
+    resource_type: "auto",
   },
 });
 
+const upload = multer({ storage });
 export default upload;
+
+
+// 👤 PROFILE IMAGE UPLOADER
+const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "profiles",
+    resource_type: "image",
+  },
+});
+
+export const profileUpload = multer({ storage: profileStorage });

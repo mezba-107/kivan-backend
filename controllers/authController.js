@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import cloudinary from "../config/cloudinary.js";
+
 
 // ===================== SIGNUP =====================
 export const signupUser = async (req, res) => {
@@ -154,18 +156,33 @@ export const updateProfileImage = async (req, res) => {
       return res.status(400).json({ message: "No image uploaded" });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.userId, // ✅ FIXED
-      { profileImage: req.file.filename },
-      { new: true }
-    );
+    // 1️⃣ Find user
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    // 2️⃣ Delete old image from Cloudinary
+    if (user.profileImage?.public_id) {
+      await cloudinary.uploader.destroy(user.profileImage.public_id);
+    }
+
+    // 3️⃣ Save new image (Cloudinary)
+    user.profileImage = {
+      url: req.file.path,        // secure_url
+      public_id: req.file.filename, // public_id
+    };
+
+    await user.save();
+
+    // 4️⃣ Response
     res.status(200).json({
       success: true,
-      image: user.profileImage,
+      profileImage: user.profileImage,
     });
+
   } catch (error) {
-    console.error("❌ Image upload error:", error);
+    console.error("❌ Profile image error:", error);
     res.status(500).json({ message: "Image upload failed" });
   }
 };

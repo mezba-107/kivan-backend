@@ -3,7 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import User from "../models/user.js";
+import upload, { profileUpload } from "../middleware/upload.js";
+import authMiddleware from "../middleware/auth.js";
+import { updateProfileImage } from "../controllers/authController.js";
 import { sendResetEmail } from "../utils/email.js";
+
 
 const router = express.Router();
 
@@ -87,20 +91,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
 /* ============================================================
   UPDATE PROFILE IMAGE
 ============================================================ */
 
-import upload from "../middleware/profileUpload.js";
-import { updateProfileImage } from "../controllers/authController.js";
-import protect from "../middleware/auth.js";
-
 router.put(
-  "/update-profile-image",
-  protect,
-  upload.single("image"),
+  "/profile-pic",
+  authMiddleware,
+  profileUpload.single("profile"),
   updateProfileImage
 );
+
 
 
 /* ============================================================
@@ -185,9 +187,6 @@ router.put("/update-city", async (req, res) => {
 });
 
 
-
-
-import authMiddleware from "../middleware/auth.js";
 
 /* ============================================================
   RESET PASSWORD (Profile → Current + New Pass)

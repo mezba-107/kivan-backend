@@ -4,30 +4,46 @@ const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
     },
 
     price: {
       type: Number,
-      required: true
+      required: true,
     },
 
     description: {
-      type: String
+      type: String,
     },
 
+    // ✅ Main image (Cloudinary)
     image: {
-      type: String, // image path (uploads/xxx.jpg)
-      required: true
+      url: {
+        type: String,
+        required: true,
+      },
+      public_id: {
+        type: String,
+        required: true,
+      },
     },
 
-    gallery: [String],     // ✅ NEW gallery field
+    // ✅ Gallery images (Cloudinary)
+    gallery: [
+      {
+        url: {
+          type: String,
+        },
+        public_id: {
+          type: String,
+        },
+      },
+    ],
 
-   category: {
-  type: String,
-  required: true,
-},
-
+    category: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

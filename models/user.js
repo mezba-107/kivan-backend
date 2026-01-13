@@ -14,7 +14,14 @@ role: {
 
 
 profileImage: {
-  type: String,
+  url: {
+    type: String,
+    default: "",
+  },
+  public_id: {
+    type: String,
+    default: "",
+  },
 },
 
 
