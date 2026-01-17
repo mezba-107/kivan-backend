@@ -35,8 +35,19 @@ router.post("/signup", async (req, res) => {
 
     await newUser.save();
 
+    // 🔥 TOKEN GENERATE (THIS WAS MISSING)
+    const token = jwt.sign(
+      {
+        userId: newUser._id,
+        role: newUser.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     res.status(201).json({
       message: "Signup successful",
+      token, // ✅ VERY IMPORTANT
       user: {
         id: newUser._id,
         name: newUser.name,
@@ -47,6 +58,7 @@ router.post("/signup", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
 
 /* ============================================================
   LOGIN
