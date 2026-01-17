@@ -1,42 +1,44 @@
 import express from "express";
 import Order from "../models/order.js";
 import auth from "../middleware/auth.js";
+import role from "../middleware/role.js"; // ✅ role middleware
 
 const router = express.Router();
 
 /* ==============================
-   📊 ADMIN ORDER COUNT
+   📊 ADMIN / MODERATOR ORDER COUNT
 ============================== */
-router.get("/admin/order-stats", auth, async (req, res) => {
-  try {
-    const total = await Order.countDocuments();
+router.get(
+  "/admin/order-stats",
+  auth,
+  role("admin", "moderator"), // ✅ BOTH allowed
+  async (req, res) => {
+    try {
+      const total = await Order.countDocuments();
 
+      const pending = await Order.countDocuments({ status: "pending" });
+      const confirmed = await Order.countDocuments({ status: "confirmed" });
+      const shipped = await Order.countDocuments({ status: "shipped" });
+      const outForDelivery = await Order.countDocuments({ status: "out-for-delivery" });
+      const delivered = await Order.countDocuments({ status: "delivered" });
+      const returned = await Order.countDocuments({ status: "returned" });
+      const cancelled = await Order.countDocuments({ status: "cancelled" });
 
-    const pending = await Order.countDocuments({ status: "pending" });
-    const confirmed = await Order.countDocuments({ status: "confirmed" });
-    const shipped = await Order.countDocuments({ status: "shipped" });
-    const outForDelivery = await Order.countDocuments({ status: "out-for-delivery" });
-    const delivered = await Order.countDocuments({ status: "delivered" });
-    const returned = await Order.countDocuments({ status: "returned" });
-    const cancelled = await Order.countDocuments({ status: "cancelled" });
+      res.json({
+        total,
+        pending,
+        confirmed,
+        shipped,
+        outForDelivery,
+        delivered,
+        returned,
+        cancelled
+      });
 
-
-res.json({
-  total,
-  pending,
-  confirmed,
-  shipped,
-  outForDelivery,
-  delivered,
-  returned,
-  cancelled
-  
-});
-
-
-  } catch (err) {
-    res.status(500).json({ message: "Server Error" });
+    } catch (err) {
+      res.status(500).json({ message: "Server Error" });
+    }
   }
-});
+);
 
 export default router;

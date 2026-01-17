@@ -69,11 +69,6 @@ cancelRequest: {
 
 
 
-//     shippingCost: {
-//   type: Number,
-//   default: 0
-// },
-
 paymentMethod: {
   type: String,
   default: "cod"

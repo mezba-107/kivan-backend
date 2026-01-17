@@ -1,55 +1,113 @@
 import express from "express";
-import upload from "../middleware/upload.js";
+import {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  productStats,
+  removeGalleryImage,
+} from "../controllers/productController.js";
+
 import protect from "../middleware/auth.js";
-import isAdmin from "../middleware/isAdmin.js";
+import role from "../middleware/role.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-/**
- * ✅ PRODUCT IMAGE UPLOAD
- * Admin only
- * returns image URL
- */
-router.post(
-  "/product",
+/* ======================
+   👀 VIEW PRODUCTS
+   Admin + Moderator ONLY
+====================== */
+router.get(
+  "/",
   protect,
-  isAdmin,
-  upload.single("image"),
-  (req, res) => {
-    res.status(201).json({
-      image: `/uploads/products/${req.file.filename}`,
-    });
-  }
+  role("admin", "moderator"),
+  getProducts
 );
 
-
-// ===============================
-// ✅ UPLOAD PRODUCT GALLERY
-// ===============================
-
-router.post(
-  "/gallery",
+router.get(
+  "/:id",
   protect,
-  isAdmin,
-  upload.array("gallery", 5), // max 5 images
-  (req, res) => {
-    try {
+  role("admin", "moderator"),
+  getProductById
+);
 
-      // 🔍 DEBUG LOGS (ADD THESE)
-      console.log("GALLERY FILES:", req.files);
-      console.log("GALLERY BODY:", req.body);
+/* ======================
+   ➕ CREATE PRODUCT
+   Admin + Moderator
+====================== */
+router.post(
+  "/",
+  protect,
+  role("admin", "moderator"),
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "gallery", maxCount: 5 },
+  ]),
+  createProduct
+);
 
-      const images = req.files.map(
-        file => `/uploads/products/${file.filename}`
-      );
+/* ======================
+   ✏️ UPDATE PRODUCT
+   Admin + Moderator
+====================== */
+router.put(
+  "/:id",
+  protect,
+  role("admin", "moderator"),
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "gallery", maxCount: 5 },
+  ]),
+  updateProduct
+);
 
-      res.json({ images });
+/* ======================
+   🖼️ REMOVE GALLERY IMAGE
+   Admin + Moderator
+====================== */
+router.delete(
+  "/:id/gallery",
+  protect,
+  role("admin", "moderator"),
+  removeGalleryImage
+);
 
-    } catch (err) {
-      console.error("❌ GALLERY ERROR:", err); // 👈 ADD
-      res.status(500).json({ message: "Gallery upload failed" });
-    }
-  }
+/* ======================
+   🗑️ DELETE PRODUCT
+   Admin ONLY
+====================== */
+router.delete(
+  "/:id",
+  protect,
+  role("admin"),
+  deleteProduct
+);
+
+/* ======================
+   📊 PRODUCT STATS
+   Admin ONLY
+====================== */
+router.get(
+  "/admin/product-stats",
+  protect,
+  role("admin"),
+  productStats
+);
+
+/* ======================
+   🌍 PUBLIC – WEBSITE VIEW
+   No Auth Required
+====================== */
+router.get(
+  "/public",
+  getProducts
+);
+
+router.get(
+  "/public/:id",
+  getProductById
 );
 
 

@@ -10,19 +10,26 @@ import {
 } from "../controllers/productController.js";
 
 import protect from "../middleware/auth.js";
-import isAdmin from "../middleware/isAdmin.js";
+import role from "../middleware/role.js"; // ✅ CHANGE
 import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
+// ===============================
+// 👀 VIEW PRODUCTS
+// Public (website product page)
+// ===============================
 router.get("/", getProducts);
 router.get("/:id", getProductById);
 
-// ✅ image + gallery support
+// ===============================
+// ➕ CREATE PRODUCT
+// Admin + Moderator
+// ===============================
 router.post(
   "/",
   protect,
-  isAdmin,
+  role("admin", "moderator"),
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "gallery", maxCount: 5 },
@@ -30,10 +37,14 @@ router.post(
   createProduct
 );
 
+// ===============================
+// ✏️ UPDATE PRODUCT
+// Admin + Moderator
+// ===============================
 router.put(
   "/:id",
   protect,
-  isAdmin,
+  role("admin", "moderator"),
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "gallery", maxCount: 5 },
@@ -41,15 +52,37 @@ router.put(
   updateProduct
 );
 
-// ✅ ADD: delete single gallery image
+// ===============================
+// 🖼️ REMOVE GALLERY IMAGE
+// Admin + Moderator
+// ===============================
 router.delete(
   "/:id/gallery",
   protect,
-  isAdmin,
+  role("admin", "moderator"),
   removeGalleryImage
 );
 
-router.delete("/:id", protect, isAdmin, deleteProduct);
-router.get("/admin/product-stats", protect, isAdmin, productStats);
+// ===============================
+// 🗑️ DELETE PRODUCT
+// Admin ONLY
+// ===============================
+router.delete(
+  "/:id",
+  protect,
+  role("admin"),
+  deleteProduct
+);
+
+// ===============================
+// 📊 PRODUCT STATS
+// Admin + moderator ONLY
+// ===============================
+router.get(
+  "/admin/product-stats",
+  protect,
+  role("admin" , "moderator"),
+  productStats
+);
 
 export default router;

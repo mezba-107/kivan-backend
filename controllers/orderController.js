@@ -209,3 +209,17 @@ export const getGuestOrders = async (req, res) => {
 
 
 
+// ===============================
+// GET ORDERS BY USER (ADMIN)
+// ===============================
+export const getOrdersByUser = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      user: req.params.userId
+    }).sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
